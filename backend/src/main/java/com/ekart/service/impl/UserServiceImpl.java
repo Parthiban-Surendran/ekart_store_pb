@@ -3,6 +3,7 @@ package com.ekart.service.impl;
 import com.ekart.common.dto.UserRequest;
 import com.ekart.common.dto.UserResponse;
 import com.ekart.entity.User;
+import com.ekart.exception.EmailAlreadyExistsException;
 import com.ekart.repository.UserRepository;
 import com.ekart.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +22,7 @@ public class UserServiceImpl implements UserService {
     public UserResponse createUser(UserRequest request) {
 
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("Email already exists");
+            throw new EmailAlreadyExistsException("Email already exists");
         }
 
         User user = User.builder()
