@@ -7,6 +7,7 @@ import com.ekart.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/users")
@@ -17,7 +18,8 @@ public class UserController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ApiResponse<UserResponse> createUser(@RequestBody UserRequest request) {
+
+    public ApiResponse<UserResponse> createUser(@Valid @RequestBody UserRequest request) {
 
         UserResponse response = userService.createUser(request);
 
