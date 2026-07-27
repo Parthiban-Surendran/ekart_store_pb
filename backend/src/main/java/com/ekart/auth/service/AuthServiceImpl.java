@@ -2,6 +2,7 @@ package com.ekart.auth.service;
 
 import com.ekart.auth.dto.LoginRequest;
 import com.ekart.auth.dto.LoginResponse;
+import com.ekart.auth.jwt.JwtService;
 import com.ekart.entity.User;
 import com.ekart.exception.UnauthorizedException;
 import com.ekart.repository.UserRepository;
@@ -15,6 +16,7 @@ public class AuthServiceImpl implements AuthService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
 
     @Override
     public LoginResponse login(LoginRequest request) {
@@ -27,11 +29,14 @@ public class AuthServiceImpl implements AuthService {
             throw new UnauthorizedException("Invalid email or password");
         }
 
+        String token = jwtService.generateToken(user.getEmail());
+
         return LoginResponse.builder()
                 .id(user.getId())
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())
                 .email(user.getEmail())
+                .token(token)
                 .build();
     }
 }
