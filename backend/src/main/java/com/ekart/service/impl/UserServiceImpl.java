@@ -7,12 +7,15 @@ import com.ekart.repository.UserRepository;
 import com.ekart.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public UserResponse createUser(UserRequest request) {
@@ -25,7 +28,7 @@ public class UserServiceImpl implements UserService {
                 .firstName(request.getFirstName())
                 .lastName(request.getLastName())
                 .email(request.getEmail())
-                .password(request.getPassword()) // We'll hash this later using Spring Security
+                .password(passwordEncoder.encode(request.getPassword())) // We'll hash this later using Spring Security
                 .phone(request.getPhone())
                 .build();
 
