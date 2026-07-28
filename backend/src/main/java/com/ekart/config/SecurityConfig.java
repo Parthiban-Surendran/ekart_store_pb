@@ -29,10 +29,13 @@ public class SecurityConfig {
                                 "/api/users"
                         ).permitAll()
 
-                        .requestMatchers("/api/admin/**")
-                        .hasAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/products")
+                        .permitAll()
 
                         .requestMatchers(HttpMethod.POST, "/api/products")
+                        .hasAuthority("ADMIN")
+
+                        .requestMatchers("/api/admin/**")
                         .hasAuthority("ADMIN")
 
                         .requestMatchers("/api/users/me")

@@ -7,12 +7,54 @@ import com.ekart.repository.ProductRepository;
 import com.ekart.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 @Service
 @RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
+
+    @Override
+    public Page<ProductResponse> getAllProducts(
+            int page,
+            int size,
+            String sortBy,
+            String direction,
+            String keyword) {
+
+        Sort sort = direction.equalsIgnoreCase("desc")
+                ? Sort.by(sortBy).descending()
+                : Sort.by(sortBy).ascending();
+
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        Page<Product> products;
+
+        if (keyword == null || keyword.isBlank()) {
+            products = productRepository.findByActiveTrue(pageable);
+        } else {
+            products = productRepository.findByActiveTrueAndNameContainingIgnoreCase(
+                    keyword,
+                    pageable
+            );
+        }
+
+        return products.map(product ->
+                ProductResponse.builder()
+                        .id(product.getId())
+                        .name(product.getName())
+                        .description(product.getDescription())
+                        .price(product.getPrice())
+                        .stock(product.getStock())
+                        .imageUrl(product.getImageUrl())
+                        .active(product.getActive())
+                        .build()
+        );
+    }
 
     @Override
     public ProductResponse createProduct(ProductRequest request) {
