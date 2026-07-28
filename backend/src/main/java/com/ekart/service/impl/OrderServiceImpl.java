@@ -1,5 +1,7 @@
 package com.ekart.service.impl;
 
+import com.ekart.common.dto.CheckoutRequest;
+import com.ekart.common.dto.OrderAddressResponse;
 import com.ekart.common.dto.OrderItemResponse;
 import com.ekart.common.dto.OrderResponse;
 import com.ekart.common.entity.*;
@@ -22,9 +24,10 @@ public class OrderServiceImpl implements OrderService {
     private final CartItemRepository cartItemRepository;
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
+    private final AddressRepository addressRepository;
 
     @Override
-    public OrderResponse checkout() {
+    public OrderResponse checkout(CheckoutRequest request) {
 
         User user = getCurrentUser();
 
@@ -36,8 +39,18 @@ public class OrderServiceImpl implements OrderService {
             throw new RuntimeException("Cart is empty");
         }
 
+        Address address = addressRepository
+                .findByIdAndUser(
+                        request.getAddressId(),
+                        user
+                )
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Address not found"));
+
         Order order = Order.builder()
                 .user(user)
+                .user(user)
+                .address(address)
                 .status("PLACED")
                 .totalAmount(java.math.BigDecimal.ZERO)
                 .build();
@@ -152,12 +165,29 @@ public class OrderServiceImpl implements OrderService {
                         )
                         .toList();
 
+        OrderAddressResponse addressResponse = null;
+
+        if (order.getAddress() != null) {
+
+            addressResponse = OrderAddressResponse.builder()
+                    .id(order.getAddress().getId())
+                    .fullName(order.getAddress().getFullName())
+                    .phone(order.getAddress().getPhone())
+                    .addressLine1(order.getAddress().getAddressLine1())
+                    .addressLine2(order.getAddress().getAddressLine2())
+                    .city(order.getAddress().getCity())
+                    .state(order.getAddress().getState())
+                    .pincode(order.getAddress().getPincode())
+                    .build();
+        }
+
         return OrderResponse.builder()
                 .orderId(order.getId())
                 .status(order.getStatus())
                 .totalAmount(order.getTotalAmount())
                 .createdAt(order.getCreatedAt())
                 .items(items)
+                .address(addressResponse)
                 .build();
     }
 }

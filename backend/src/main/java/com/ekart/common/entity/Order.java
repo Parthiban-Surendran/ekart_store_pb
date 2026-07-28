@@ -24,6 +24,10 @@ public class Order {
     @JoinColumn(name = "user_id")
     private User user;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "address_id")
+    private Address address;
+
     @Column(name = "total_amount", nullable = false)
     private BigDecimal totalAmount;
 

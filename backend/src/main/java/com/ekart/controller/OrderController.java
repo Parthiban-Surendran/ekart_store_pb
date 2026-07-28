@@ -1,8 +1,10 @@
 package com.ekart.controller;
 
+import com.ekart.common.dto.CheckoutRequest;
 import com.ekart.common.dto.OrderResponse;
 import com.ekart.common.response.ApiResponse;
 import com.ekart.service.OrderService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,9 +18,10 @@ public class OrderController {
     private final OrderService orderService;
 
     @PostMapping("/checkout")
-    public ApiResponse<OrderResponse> checkout() {
+    public ApiResponse<OrderResponse> checkout(
+            @Valid @RequestBody CheckoutRequest request) {
 
-        OrderResponse response = orderService.checkout();
+        OrderResponse response = orderService.checkout(request);
 
         return ApiResponse.<OrderResponse>builder()
                 .success(true)
