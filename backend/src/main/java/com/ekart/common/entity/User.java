@@ -21,6 +21,9 @@ public class User {
     @OneToMany(mappedBy = "user")
     private List<Order> orders;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Address> addresses;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
