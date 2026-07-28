@@ -9,6 +9,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.http.HttpMethod;
 
 @Configuration
 @RequiredArgsConstructor
@@ -29,6 +30,9 @@ public class SecurityConfig {
                         ).permitAll()
 
                         .requestMatchers("/api/admin/**")
+                        .hasAuthority("ADMIN")
+
+                        .requestMatchers(HttpMethod.POST, "/api/products")
                         .hasAuthority("ADMIN")
 
                         .requestMatchers("/api/users/me")
