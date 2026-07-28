@@ -1,6 +1,6 @@
 package com.ekart.repository;
 
-import com.ekart.entity.User;
+import com.ekart.common.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

@@ -1,17 +1,20 @@
-package com.ekart.entity;
+package com.ekart.common.entity;
 
+import com.ekart.common.enums.Role;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "users")
-@Getter
-@Setter
+@Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class User {
 
     @Id
@@ -24,7 +27,7 @@ public class User {
     @Column(name = "last_name")
     private String lastName;
 
-    @Column(nullable = false, unique = true)
+    @Column(unique = true, nullable = false)
     private String email;
 
     @Column(nullable = false)
@@ -32,20 +35,28 @@ public class User {
 
     private String phone;
 
-    @Column(name = "created_at", updatable = false)
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role;
+
+    @Column(name = "created_at")
     private LocalDateTime createdAt;
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
     @PrePersist
-    public void onCreate() {
+    public void prePersist() {
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
+
+        if (role == null) {
+            role = Role.CUSTOMER;
+        }
     }
 
     @PreUpdate
-    public void onUpdate() {
+    public void preUpdate() {
         updatedAt = LocalDateTime.now();
     }
 }

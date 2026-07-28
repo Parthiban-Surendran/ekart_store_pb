@@ -3,7 +3,7 @@ package com.ekart.auth.service;
 import com.ekart.auth.dto.LoginRequest;
 import com.ekart.auth.dto.LoginResponse;
 import com.ekart.auth.jwt.JwtService;
-import com.ekart.entity.User;
+import com.ekart.common.entity.User;
 import com.ekart.exception.UnauthorizedException;
 import com.ekart.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
