@@ -7,6 +7,8 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.CascadeType;
 
 @Entity
 @Table(name = "orders")
@@ -27,6 +29,9 @@ public class Order {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "address_id")
     private Address address;
+
+    @OneToOne(mappedBy = "order", cascade = CascadeType.ALL)
+    private Payment payment;
 
     @Column(name = "total_amount", nullable = false)
     private BigDecimal totalAmount;
