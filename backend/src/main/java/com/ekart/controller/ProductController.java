@@ -68,6 +68,22 @@ public class ProductController {
         );
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<ApiResponse<ProductResponse>> updateProduct(
+            @PathVariable Long id,
+            @Valid @RequestBody ProductRequest request) {
+
+        ProductResponse response = productService.updateProduct(id, request);
+
+        return ResponseEntity.ok(
+                ApiResponse.<ProductResponse>builder()
+                        .success(true)
+                        .message("Product updated successfully")
+                        .data(response)
+                        .build()
+        );
+    }
+
     @PostMapping
     public ResponseEntity<ApiResponse<ProductResponse>> createProduct(
             @Valid @RequestBody ProductRequest request) {
@@ -79,6 +95,20 @@ public class ProductController {
                         .success(true)
                         .message("Product created successfully")
                         .data(response)
+                        .build()
+        );
+    }
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponse<String>> deleteProduct(
+            @PathVariable Long id) {
+
+        productService.deleteProduct(id);
+
+        return ResponseEntity.ok(
+                ApiResponse.<String>builder()
+                        .success(true)
+                        .message("Product deleted successfully")
+                        .data("Product marked as inactive")
                         .build()
         );
     }
