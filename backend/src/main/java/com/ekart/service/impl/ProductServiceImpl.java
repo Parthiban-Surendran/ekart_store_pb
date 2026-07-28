@@ -5,6 +5,7 @@ import com.ekart.common.dto.ProductResponse;
 import com.ekart.common.entity.Product;
 import com.ekart.exception.ResourceNotFoundException;
 import com.ekart.repository.ProductRepository;
+import com.ekart.repository.CategoryRepository;
 import com.ekart.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -12,6 +13,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import com.ekart.common.dto.UpdateProductRequest;
+import com.ekart.common.entity.Category;
+import com.ekart.common.entity.Product;
+import com.ekart.exception.ResourceNotFoundException;
 
 @Service
 @RequiredArgsConstructor
@@ -103,7 +108,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductResponse updateProduct(Long id, ProductRequest request) {
 
-        Product product = productRepository.findByIdAndActiveTrue(id)
+        Product product = productRepository.findById(id)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Product not found"));
 
@@ -113,16 +118,16 @@ public class ProductServiceImpl implements ProductService {
         product.setStock(request.getStock());
         product.setImageUrl(request.getImageUrl());
 
-        Product updated = productRepository.save(product);
+        Product saved = productRepository.save(product);
 
         return ProductResponse.builder()
-                .id(updated.getId())
-                .name(updated.getName())
-                .description(updated.getDescription())
-                .price(updated.getPrice())
-                .stock(updated.getStock())
-                .imageUrl(updated.getImageUrl())
-                .active(updated.getActive())
+                .id(saved.getId())
+                .name(saved.getName())
+                .description(saved.getDescription())
+                .price(saved.getPrice())
+                .stock(saved.getStock())
+                .imageUrl(saved.getImageUrl())
+                .active(saved.getActive())
                 .build();
     }
 
