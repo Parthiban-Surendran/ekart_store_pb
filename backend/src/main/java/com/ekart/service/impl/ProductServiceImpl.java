@@ -3,6 +3,7 @@ package com.ekart.service.impl;
 import com.ekart.common.dto.ProductRequest;
 import com.ekart.common.dto.ProductResponse;
 import com.ekart.common.entity.Product;
+import com.ekart.exception.ResourceNotFoundException;
 import com.ekart.repository.ProductRepository;
 import com.ekart.service.ProductService;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,24 @@ import org.springframework.data.domain.Sort;
 public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
+
+    @Override
+    public ProductResponse getProductById(Long id) {
+
+        Product product = productRepository.findByIdAndActiveTrue(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Product not found"));
+
+        return ProductResponse.builder()
+                .id(product.getId())
+                .name(product.getName())
+                .description(product.getDescription())
+                .price(product.getPrice())
+                .stock(product.getStock())
+                .imageUrl(product.getImageUrl())
+                .active(product.getActive())
+                .build();
+    }
 
     @Override
     public Page<ProductResponse> getAllProducts(

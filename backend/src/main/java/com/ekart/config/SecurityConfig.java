@@ -29,7 +29,7 @@ public class SecurityConfig {
                                 "/api/users"
                         ).permitAll()
 
-                        .requestMatchers(HttpMethod.GET, "/api/products")
+                        .requestMatchers(HttpMethod.GET, "/api/products/**")
                         .permitAll()
 
                         .requestMatchers(HttpMethod.POST, "/api/products")

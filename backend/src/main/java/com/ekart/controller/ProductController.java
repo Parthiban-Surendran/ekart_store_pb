@@ -53,6 +53,21 @@ public class ProductController {
         );
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponse<ProductResponse>> getProductById(
+            @PathVariable Long id) {
+
+        ProductResponse response = productService.getProductById(id);
+
+        return ResponseEntity.ok(
+                ApiResponse.<ProductResponse>builder()
+                        .success(true)
+                        .message("Product fetched successfully")
+                        .data(response)
+                        .build()
+        );
+    }
+
     @PostMapping
     public ResponseEntity<ApiResponse<ProductResponse>> createProduct(
             @Valid @RequestBody ProductRequest request) {

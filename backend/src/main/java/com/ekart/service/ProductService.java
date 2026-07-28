@@ -10,6 +10,8 @@ public interface ProductService {
 
     ProductResponse createProduct(ProductRequest request);
 
+    ProductResponse getProductById(Long id);
+
     Page<ProductResponse> getAllProducts(
             int page,
             int size,
@@ -17,4 +19,5 @@ public interface ProductService {
             String direction,
             String keyword
     );
+
 }
