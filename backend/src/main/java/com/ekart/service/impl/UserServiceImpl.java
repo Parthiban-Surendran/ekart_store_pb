@@ -10,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import com.ekart.common.enums.Role;
+import com.ekart.common.dto.UserProfileResponse;
+import com.ekart.exception.ResourceNotFoundException;
 
 @Service
 @RequiredArgsConstructor
@@ -43,6 +45,23 @@ public class UserServiceImpl implements UserService {
                 .lastName(savedUser.getLastName())
                 .email(savedUser.getEmail())
                 .phone(savedUser.getPhone())
+                .build();
+    }
+
+    @Override
+    public UserProfileResponse getCurrentUser(String email) {
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("User not found"));
+
+        return UserProfileResponse.builder()
+                .id(user.getId())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .email(user.getEmail())
+                .phone(user.getPhone())
+                .role(user.getRole())
                 .build();
     }
 }
