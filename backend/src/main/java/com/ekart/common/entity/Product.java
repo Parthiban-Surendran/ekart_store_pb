@@ -14,6 +14,10 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class Product {
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id")
+    private Category category;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

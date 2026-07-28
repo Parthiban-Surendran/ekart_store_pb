@@ -13,16 +13,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import com.ekart.common.dto.UpdateProductRequest;
 import com.ekart.common.entity.Category;
-import com.ekart.common.entity.Product;
-import com.ekart.exception.ResourceNotFoundException;
 
 @Service
 @RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
+
+    private final CategoryRepository categoryRepository;
 
     @Override
     public ProductResponse getProductById(Long id) {
@@ -39,6 +38,7 @@ public class ProductServiceImpl implements ProductService {
                 .stock(product.getStock())
                 .imageUrl(product.getImageUrl())
                 .active(product.getActive())
+                .category(product.getCategory().getName())
                 .build();
     }
 
@@ -76,6 +76,7 @@ public class ProductServiceImpl implements ProductService {
                         .stock(product.getStock())
                         .imageUrl(product.getImageUrl())
                         .active(product.getActive())
+                        .category(product.getCategory().getName())
                         .build()
         );
     }
@@ -83,12 +84,17 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductResponse createProduct(ProductRequest request) {
 
+        Category category = categoryRepository.findById(request.getCategoryId())
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Category not found"));
+
         Product product = Product.builder()
                 .name(request.getName())
                 .description(request.getDescription())
                 .price(request.getPrice())
                 .stock(request.getStock())
                 .imageUrl(request.getImageUrl())
+                .category(category)
                 .active(true)
                 .build();
 
@@ -102,6 +108,7 @@ public class ProductServiceImpl implements ProductService {
                 .stock(saved.getStock())
                 .imageUrl(saved.getImageUrl())
                 .active(saved.getActive())
+                .category(saved.getCategory().getName())
                 .build();
     }
 
@@ -112,11 +119,16 @@ public class ProductServiceImpl implements ProductService {
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Product not found"));
 
+        Category category = categoryRepository.findById(request.getCategoryId())
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Category not found"));
+
         product.setName(request.getName());
         product.setDescription(request.getDescription());
         product.setPrice(request.getPrice());
         product.setStock(request.getStock());
         product.setImageUrl(request.getImageUrl());
+        product.setCategory(category);
 
         Product saved = productRepository.save(product);
 
@@ -128,6 +140,7 @@ public class ProductServiceImpl implements ProductService {
                 .stock(saved.getStock())
                 .imageUrl(saved.getImageUrl())
                 .active(saved.getActive())
+                .category(saved.getCategory().getName())
                 .build();
     }
 
@@ -141,5 +154,32 @@ public class ProductServiceImpl implements ProductService {
         product.setActive(false);
 
         productRepository.save(product);
+    }
+    @Override
+    public Page<ProductResponse> getProductsByCategory(
+            Long categoryId,
+            int page,
+            int size) {
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        Page<Product> products =
+                productRepository.findByCategoryIdAndActiveTrue(
+                        categoryId,
+                        pageable
+                );
+
+        return products.map(product ->
+                ProductResponse.builder()
+                        .id(product.getId())
+                        .name(product.getName())
+                        .description(product.getDescription())
+                        .price(product.getPrice())
+                        .stock(product.getStock())
+                        .imageUrl(product.getImageUrl())
+                        .active(product.getActive())
+                        .category(product.getCategory().getName())
+                        .build()
+        );
     }
 }

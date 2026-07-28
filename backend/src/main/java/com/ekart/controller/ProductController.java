@@ -112,4 +112,25 @@ public class ProductController {
                         .build()
         );
     }
+    @GetMapping("/category/{categoryId}")
+    public ResponseEntity<ApiResponse<Page<ProductResponse>>> getProductsByCategory(
+            @PathVariable Long categoryId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        Page<ProductResponse> response =
+                productService.getProductsByCategory(
+                        categoryId,
+                        page,
+                        size
+                );
+
+        return ResponseEntity.ok(
+                ApiResponse.<Page<ProductResponse>>builder()
+                        .success(true)
+                        .message("Products fetched by category")
+                        .data(response)
+                        .build()
+        );
+    }
 }

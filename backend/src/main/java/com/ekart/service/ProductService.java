@@ -24,4 +24,10 @@ public interface ProductService {
             String keyword
     );
 
+    Page<ProductResponse> getProductsByCategory(
+            Long categoryId,
+            int page,
+            int size
+    );
+
 }

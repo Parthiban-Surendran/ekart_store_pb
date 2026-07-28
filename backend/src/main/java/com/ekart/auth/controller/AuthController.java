@@ -2,6 +2,7 @@ package com.ekart.auth.controller;
 
 import com.ekart.auth.dto.LoginRequest;
 import com.ekart.auth.dto.LoginResponse;
+import com.ekart.auth.dto.RegisterRequest;
 import com.ekart.auth.service.AuthService;
 import com.ekart.common.response.ApiResponse;
 import jakarta.validation.Valid;
@@ -16,9 +17,11 @@ public class AuthController {
 
     private final AuthService authService;
 
+
     @PostMapping("/login")
     @ResponseStatus(HttpStatus.OK)
-    public ApiResponse<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
+    public ApiResponse<LoginResponse> login(
+            @Valid @RequestBody LoginRequest request) {
 
         LoginResponse response = authService.login(request);
 
@@ -26,6 +29,20 @@ public class AuthController {
                 .success(true)
                 .message("Login successful")
                 .data(response)
+                .build();
+    }
+
+
+    @PostMapping("/register")
+    @ResponseStatus(HttpStatus.CREATED)
+    public ApiResponse<?> register(
+            @Valid @RequestBody RegisterRequest request) {
+
+        authService.register(request);
+
+        return ApiResponse.builder()
+                .success(true)
+                .message("Registration successful")
                 .build();
     }
 }

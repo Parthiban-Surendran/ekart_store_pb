@@ -4,11 +4,13 @@ import com.ekart.auth.dto.LoginRequest;
 import com.ekart.auth.dto.LoginResponse;
 import com.ekart.auth.jwt.JwtService;
 import com.ekart.common.entity.User;
+import com.ekart.common.enums.Role;
 import com.ekart.exception.UnauthorizedException;
 import com.ekart.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import com.ekart.auth.dto.RegisterRequest;
 
 @Service
 @RequiredArgsConstructor
@@ -38,5 +40,23 @@ public class AuthServiceImpl implements AuthService {
                 .email(user.getEmail())
                 .token(token)
                 .build();
+    }
+    @Override
+    public void register(RegisterRequest request) {
+
+        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
+            throw new RuntimeException("Email already exists");
+        }
+
+        User user = User.builder()
+                .firstName(request.getFirstName())
+                .lastName(request.getLastName())
+                .email(request.getEmail())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .phone(request.getPhone())
+                .role(Role.CUSTOMER)
+                .build();
+
+        userRepository.save(user);
     }
 }

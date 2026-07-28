@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "categories")
@@ -12,6 +13,9 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Category {
+
+    @OneToMany(mappedBy = "category")
+    private List<Product> products;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
