@@ -55,7 +55,7 @@ public class SecurityConfig {
                         .hasAuthority("ADMIN")
 
                         .requestMatchers("/api/admin/**")
-                        .hasAuthority("ADMIN")
+                        .authenticated()
 
                         .requestMatchers("/api/users/me")
                         .authenticated()

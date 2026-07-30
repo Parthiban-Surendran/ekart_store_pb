@@ -1,5 +1,8 @@
 package com.ekart.common.entity;
 
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import com.ekart.common.enums.OrderStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -36,8 +39,9 @@ public class Order {
     @Column(name = "total_amount", nullable = false)
     private BigDecimal totalAmount;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String status;
+    private OrderStatus status;
 
     @OneToMany(
             mappedBy = "order",

@@ -1,16 +1,15 @@
 package com.ekart.service.impl;
 
-import com.ekart.common.dto.CheckoutRequest;
-import com.ekart.common.dto.OrderAddressResponse;
-import com.ekart.common.dto.OrderItemResponse;
-import com.ekart.common.dto.OrderResponse;
+import com.ekart.common.dto.*;
 import com.ekart.common.entity.*;
+import com.ekart.common.enums.OrderStatus;
 import com.ekart.exception.ResourceNotFoundException;
 import com.ekart.repository.*;
 import com.ekart.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import com.ekart.common.entity.Payment;
 
 import java.util.List;
 
@@ -25,6 +24,7 @@ public class OrderServiceImpl implements OrderService {
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
     private final AddressRepository addressRepository;
+    private final PaymentRepository paymentRepository;
 
     @Override
     public OrderResponse checkout(CheckoutRequest request) {
@@ -51,7 +51,7 @@ public class OrderServiceImpl implements OrderService {
                 .user(user)
                 .user(user)
                 .address(address)
-                .status("PLACED")
+                .status(OrderStatus.PLACED)
                 .totalAmount(java.math.BigDecimal.ZERO)
                 .build();
 
@@ -134,6 +134,37 @@ public class OrderServiceImpl implements OrderService {
         return mapToResponse(order);
     }
 
+    @Override
+    public List<OrderResponse> getAllOrders() {
+
+        return orderRepository.findAll()
+                .stream()
+                .map(this::mapToResponse)
+                .toList();
+    }
+
+    @Override
+    public OrderResponse updateOrderStatus(
+            Long orderId,
+            UpdateOrderStatusRequest request
+    ) {
+
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Order not found")
+                );
+
+        order.setStatus(
+                OrderStatus.valueOf(
+                        request.getStatus().toUpperCase()
+                )
+        );
+
+        orderRepository.save(order);
+
+        return mapToResponse(order);
+    }
+
     private User getCurrentUser() {
 
         String email = SecurityContextHolder.getContext()
@@ -183,11 +214,64 @@ public class OrderServiceImpl implements OrderService {
 
         return OrderResponse.builder()
                 .orderId(order.getId())
-                .status(order.getStatus())
+                .status(order.getStatus().name())
                 .totalAmount(order.getTotalAmount())
                 .createdAt(order.getCreatedAt())
                 .items(items)
                 .address(addressResponse)
                 .build();
+    }
+
+    @Override
+    public OrderResponse cancelOrder(Long orderId) {
+
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Order not found"));
+        for (OrderItem item : order.getItems()) {
+
+            Product product = item.getProduct();
+
+            product.setStock(
+                    product.getStock() + item.getQuantity()
+            );
+
+            productRepository.save(product);
+        }
+
+        order.setStatus(OrderStatus.CANCELLED);
+
+        orderRepository.save(order);
+
+        return mapToResponse(order);
+    }
+
+    @Override
+    public OrderResponse refundOrder(Long orderId) {
+
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Order not found"));
+
+        if (!order.getStatus().equals(OrderStatus.CANCELLED)) {
+
+            throw new RuntimeException(
+                    "Only cancelled orders can be refunded"
+            );
+        }
+
+        Payment payment = paymentRepository.findByOrderId(order.getId())
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Payment not found"));
+
+        payment.setPaymentStatus("REFUNDED");
+
+        paymentRepository.save(payment);
+
+        order.setStatus(OrderStatus.REFUNDED);
+
+        orderRepository.save(order);
+
+        return mapToResponse(order);
     }
 }
